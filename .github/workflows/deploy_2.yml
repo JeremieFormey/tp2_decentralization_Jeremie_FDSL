@@ -1,21 +1,24 @@
-name: Deploy to IPFS with Pinata
+name: Deploy to Pinata
 
 on:
   push:
     branches:
-      - main
+      - main  # Le workflow se déclenchera lors de chaque modification poussée sur la branche "main".
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3  # Récupère le code du dépôt.
 
-      - name: Upload to Pinata
-        uses: anantaramdas/ipfs-pinata-deploy-action@v1.2.0
-        with:
-          pinata_api_key: ${{ secrets.PINATA_API_KEY }}
-          pinata_secret_api_key: ${{ secrets.PINATA_SECRET_API_KEY }}
-          path: './my-website'
+    - name: Upload files to Pinata
+      env:
+        PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}  # Vos clés API Pinata.
+        PINATA_SECRET_API_KEY: ${{ secrets.PINATA_SECRET_API_KEY }}
+      run: |
+        curl -X POST "https://api.pinata.cloud/pinning/pinFileToIPFS" \
+          -H "pinata_api_key: $PINATA_API_KEY" \
+          -H "pinata_secret_api_key: $PINATA_SECRET_API_KEY" \
+          -F file=@index.html
